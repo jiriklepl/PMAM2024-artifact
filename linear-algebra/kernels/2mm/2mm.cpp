@@ -20,13 +20,16 @@ constexpr auto k_vec =  noarr::vector<'k'>();
 constexpr auto l_vec =  noarr::vector<'l'>();
 
 struct tuning {
-	DEFINE_PROTO_STRUCT(block_i1, noarr::hoist<'i'>());
-	DEFINE_PROTO_STRUCT(block_j1, noarr::hoist<'j'>());
-	DEFINE_PROTO_STRUCT(block_i2, noarr::hoist<'i'>());
-	DEFINE_PROTO_STRUCT(block_l2, noarr::hoist<'l'>());
+	DEFINE_PROTO_STRUCT(block_i1, noarr::strip_mine_dynamic<'i', 'I', 'i', 's'>(32));
+	DEFINE_PROTO_STRUCT(block_j1, noarr::strip_mine_dynamic<'j', 'J', 'j', 't'>(2));
+	DEFINE_PROTO_STRUCT(block_i2, noarr::neutral_proto());
+	DEFINE_PROTO_STRUCT(block_l2, noarr::strip_mine_dynamic<'l', 'L', 'l', 'u'>(32));
 
-	DEFINE_PROTO_STRUCT(order1, block_j1 ^ block_i1);
-	DEFINE_PROTO_STRUCT(order2, block_l2 ^ block_i2);
+	DEFINE_PROTO_STRUCT(loop_order1, noarr::hoist<'j'>() ^ noarr::hoist<'i'>());
+	DEFINE_PROTO_STRUCT(loop_order2, noarr::hoist<'l'>() ^ noarr::hoist<'i'>());
+
+	DEFINE_PROTO_STRUCT(order1, loop_order1 ^ block_j1 ^ block_i1);
+	DEFINE_PROTO_STRUCT(order2, loop_order2 ^ block_l2 ^ block_i2);
 
 	DEFINE_PROTO_STRUCT(tmp_layout, j_vec ^ i_vec);
 	DEFINE_PROTO_STRUCT(a_layout, k_vec ^ i_vec);
