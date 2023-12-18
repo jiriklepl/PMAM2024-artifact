@@ -9,9 +9,9 @@ if [ -z "$POLYBENCH_C_DIR" ]; then
 	POLYBENCH_C_DIR="$BUILD_DIR/PolyBenchC-4.2.1"
 	mkdir -p "$POLYBENCH_C_DIR" || exit 1
 	if [ -d "$POLYBENCH_C_DIR/.git" ]; then
-		( cd "$POLYBENCH_C_DIR" && git checkout master && git pull )
+		( cd "$POLYBENCH_C_DIR" && git checkout tuned && git pull )
 	else
-		git clone "https://github.com/jiriklepl/PolyBenchC-4.2.1.git" "$POLYBENCH_C_DIR"
+		git clone --branch=tuned "https://github.com/jiriklepl/PolyBenchC-4.2.1.git" "$POLYBENCH_C_DIR"
 	fi
 fi
 
@@ -30,10 +30,15 @@ while read -r file; do
         *_autotune)
             continue
             ;;
+		gemm|2mm|floyd-warshall|covariance)
+			;;
+		*) # skip all other benchmarks
+			continue
+			;;
     esac
 
     echo "collecting $filename"
     ( srun -A kdss -p mpi-homo-short --exclusive -ww201 ./run_noarr_algorithm.sh "Noarr" "$BUILD_DIR/$filename" & wait ) > "$DATA_DIR/$filename.log"
     ( srun -A kdss -p mpi-homo-short --exclusive -ww201 ./run_c_algorithm.sh "C" "$POLYBENCH_C_DIR/$BUILD_DIR/$filename" & wait ) >> "$DATA_DIR/$filename.log"
-    echo done
+    echo "done"
 done

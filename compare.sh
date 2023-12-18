@@ -10,9 +10,9 @@ if [ -z "$POLYBENCH_C_DIR" ]; then
 	POLYBENCH_C_DIR="$BUILD_DIR/PolyBenchC-4.2.1"
 	mkdir -p "$POLYBENCH_C_DIR" || exit 1
 	if [ -d "$POLYBENCH_C_DIR/.git" ]; then
-		( cd "$POLYBENCH_C_DIR" && git pull )
+		( cd "$POLYBENCH_C_DIR" && git checkout tuned && git pull )
 	else
-		git clone "https://github.com/jiriklepl/PolyBenchC-4.2.1.git" "$POLYBENCH_C_DIR"
+		git clone --branch=tuned "https://github.com/jiriklepl/PolyBenchC-4.2.1.git" "$POLYBENCH_C_DIR"
 	fi
 fi
 
@@ -28,7 +28,12 @@ while read -r file; do
 	filename=$(basename "$file")
 
 	case "$filename" in
-		*_autotune)
+		*_autotune) # skip autotune scripts
+			continue
+			;;
+		gemm|2mm|floyd-warshall|covariance)
+			;;
+		*) # skip all other benchmarks
 			continue
 			;;
 	esac
