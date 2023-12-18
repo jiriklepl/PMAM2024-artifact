@@ -21,11 +21,13 @@ constexpr auto j_vec =  noarr::vector<'j'>();
 constexpr auto k_vec =  noarr::vector<'k'>();
 
 struct tuning {
-	DEFINE_PROTO_STRUCT(block_i, noarr::hoist<'i'>());
-	DEFINE_PROTO_STRUCT(block_j, noarr::hoist<'j'>());
-	DEFINE_PROTO_STRUCT(block_k, noarr::hoist<'k'>());
+	DEFINE_PROTO_STRUCT(block_i, noarr::strip_mine_dynamic<'i', 'I', 'i', 's'>(16));
+	DEFINE_PROTO_STRUCT(block_j, noarr::neutral_proto());
+	DEFINE_PROTO_STRUCT(block_k, noarr::strip_mine_dynamic<'k', 'K', 'k', 'u'>(8));
 
-	DEFINE_PROTO_STRUCT(order, block_j ^ block_i ^ block_k);
+	DEFINE_PROTO_STRUCT(loop_order, noarr::hoist<'j'>() ^ noarr::hoist<'i'>() ^ noarr::hoist<'k'>());
+
+	DEFINE_PROTO_STRUCT(order, loop_order ^ block_j ^ block_i ^ block_k);
 
 	DEFINE_PROTO_STRUCT(path_layout, j_vec ^ i_vec);
 } tuning;
