@@ -5,8 +5,8 @@ echo "name,implementation,time"
 find data -name "*.log" |
 while read -r file; do
     (awk -vfile="$(basename "$file" | sed 's/\..*$//')" '
-/C:/ {
-    if (C++) data_c[C] = $2
+/Baseline:/ {
+    if (Baseline++) data_baseline[Baseline] = $2
 }
 
 /Noarr:/ {
@@ -14,12 +14,12 @@ while read -r file; do
 }
 
 END {
-    for (i = 2; i <= (C > Noarr ? C : Noarr); i++) {
+    for (i = 2; i <= (Baseline > Noarr ? Baseline : Noarr); i++) {
         if (data_noarr[i] > 0)
             print(file ",noarr," data_noarr[i])
 
-        if (data_c[i] > 0)
-            print(file ",c," data_c[i])
+        if (data_baseline[i] > 0)
+            print(file ",baseline," data_baseline[i])
     }
 }' "$file" & wait )
 

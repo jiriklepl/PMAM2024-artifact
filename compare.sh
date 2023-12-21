@@ -5,14 +5,15 @@
 
 BUILD_DIR=${BUILD_DIR:-build}
 SKIP_DIFF=${SKIP_DIFF:-0}
+RUN_TBB=${RUN_TBB:-0}
 
 if [ -z "$POLYBENCH_C_DIR" ]; then
 	POLYBENCH_C_DIR="$BUILD_DIR/PolyBenchC-4.2.1"
 	mkdir -p "$POLYBENCH_C_DIR" || exit 1
 	if [ -d "$POLYBENCH_C_DIR/.git" ]; then
-		( cd "$POLYBENCH_C_DIR" && git checkout master && git pull ) || exit 1
+		( cd "$POLYBENCH_C_DIR" && git fetch && git checkout tbb && git pull ) || exit 1
 	else
-		git clone "https://github.com/jiriklepl/PolyBenchC-4.2.1.git" "$POLYBENCH_C_DIR" || exit 1
+		git clone --branch=tbb "https://github.com/jiriklepl/PolyBenchC-4.2.1.git" "$POLYBENCH_C_DIR" || exit 1
 	fi
 fi
 
@@ -31,6 +32,15 @@ while read -r file; do
 		*_autotune)
 			continue
 			;;
+		*-tbb)
+			if [ "$RUN_TBB" -eq 0 ]; then
+				continue
+			fi
+			;;
+		*)
+			if [ "$RUN_TBB" -eq 1 ]; then
+				continue
+			fi
 	esac
 
 	echo "Comparing $filename"
@@ -38,7 +48,7 @@ while read -r file; do
 	printf "\tNoarr:             "
 	"$BUILD_DIR/$filename" 2>&1 1> "$dirname/cpp"
 
-	printf "\tC:                 "
+	printf "\tBaseline:          "
 	"$POLYBENCH_C_DIR/$BUILD_DIR/$filename" 2> "$dirname/c"
 
 	if [ "$SKIP_DIFF" -eq 1 ]; then

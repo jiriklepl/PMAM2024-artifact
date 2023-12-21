@@ -4,6 +4,7 @@ export BUILD_DIR=${BUILD_DIR:-build}
 export DATASET_SIZE=${DATASET_SIZE:-EXTRALARGE}
 export DATA_TYPE=${DATA_TYPE:-FLOAT}
 export NOARR_STRUCTURES_BRANCH=${NOARR_STRUCTURES_BRANCH:-tuning}
+export RUN_TBB=${RUN_TBB:-0}
 
 if [ -z "$POLYBENCH_C_DIR" ]; then
 	POLYBENCH_C_DIR="$BUILD_DIR/PolyBenchC-4.2.1"
@@ -30,10 +31,19 @@ while read -r file; do
         *_autotune)
             continue
             ;;
+		*-tbb)
+			if [ "$RUN_TBB" -eq 0 ]; then
+				continue
+			fi
+			;;
+		*)
+			if [ "$RUN_TBB" -eq 1 ]; then
+				continue
+			fi
     esac
 
     echo "collecting $filename"
     ( srun -A kdss -p mpi-homo-short --exclusive -ww201 ./run_noarr_algorithm.sh "Noarr" "$BUILD_DIR/$filename" & wait ) > "$DATA_DIR/$filename.log"
-    ( srun -A kdss -p mpi-homo-short --exclusive -ww201 ./run_c_algorithm.sh "C" "$POLYBENCH_C_DIR/$BUILD_DIR/$filename" & wait ) >> "$DATA_DIR/$filename.log"
+    ( srun -A kdss -p mpi-homo-short --exclusive -ww201 ./run_c_algorithm.sh "Baseline" "$POLYBENCH_C_DIR/$BUILD_DIR/$filename" & wait ) >> "$DATA_DIR/$filename.log"
     echo "done"
 done
