@@ -73,3 +73,23 @@ if (MSVC)
 else()
   add_compile_options(-Wall -Wextra -pedantic -Werror)
 endif()
+
+# TBB
+
+find_package(TBB REQUIRED)
+
+# datamining
+add_executable(covariance-tbb datamining/covariance/covariance-tbb.cpp)
+target_link_libraries(covariance-tbb tbb)
+
+# linear algebra - blas
+add_executable(syr2k-tbb linear-algebra/blas/syr2k/syr2k-tbb.cpp)
+target_link_libraries(syr2k-tbb tbb)
+
+# linear algebra - kernels
+add_executable(2mm-tbb linear-algebra/kernels/2mm/2mm-tbb.cpp)
+target_link_libraries(2mm-tbb tbb)
+
+# stencils
+add_executable(heat-3d-tbb stencils/heat-3d/heat-3d-tbb.cpp)
+target_link_libraries(heat-3d-tbb tbb)
