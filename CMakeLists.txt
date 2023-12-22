@@ -77,7 +77,9 @@ endif()
 # TBB
 
 if (RUN_TBB)
-  find_package(TBB REQUIRED)
+  if (DEFINED ENV{TBBROOT})
+    link_directories($ENV{TBBROOT}/lib)
+  endif ()
 
   # datamining
   add_executable(covariance-tbb datamining/covariance/covariance-tbb.cpp)
